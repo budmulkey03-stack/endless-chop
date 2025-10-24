@@ -38,8 +38,16 @@
     stream.appendChild(fragment);
   }
 
-  // Load a ton up front
-  addChops(3000);
+// Load CHOPs with a hidden message for Jordan
+addChops(1000);
+
+const jordanLine = document.createElement("span");
+jordanLine.className = "chopline";
+jordanLine.style.color = "#f00"; // red for emphasis
+jordanLine.textContent = "Jordan... Horse dead I couldn’t do it?";
+stream.appendChild(jordanLine);
+
+addChops(2000);;
 
   // Start a loop that checks scroll position every 300ms
   setInterval(() => {
