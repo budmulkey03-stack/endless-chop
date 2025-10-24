@@ -44,7 +44,16 @@
     // Infinite scroll trigger
     window.addEventListener("scroll", () => {
       if (window.scrollY + window.innerHeight >= document.body.scrollHeight - 200) {
-        addChops(1000);
+        // Load CHOPs with a hidden message for Jordan
+addChops(1000);
+
+const jordanLine = document.createElement("span");
+jordanLine.className = "chopline";
+jordanLine.style.color = "#f00"; // red for emphasis
+jordanLine.textContent = "Jordan..I broke the Horse. you said it couldn't be done..";
+stream.appendChild(jordanLine);
+
+addChops(2000);
       }
     });
   </script>
