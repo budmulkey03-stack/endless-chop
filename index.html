@@ -3,28 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <title>endless.chop</title>
-  <script>
-  const stream = document.getElementById("chopstream");
-
-  function addChops(count = 1000) {
-    for (let i = 0; i < count; i++) {
-      const line = document.createElement("span");
-      line.className = "chopline";
-      line.textContent = "CHOP";
-      stream.appendChild(line);
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: #000;
+      color: #0f0;
+      font-family: monospace;
+      font-size: 20px;
+      overflow-x: hidden;
     }
-  }
-
-  // Load a ton up front
-  addChops(1000);
-
-  // Infinite scroll trigger
-  window.addEventListener("scroll", () => {
-    if (window.scrollY + window.innerHeight >= document.body.scrollHeight - 10) {
-      addChops(500);
+    #chopstream {
+      padding: 20px;
     }
-  });
-  </script>
+    .chopline {
+      display: block;
+    }
+  </style>
 </head>
 <body>
   <div id="chopstream"></div>
@@ -32,7 +27,7 @@
   <script>
     const stream = document.getElementById("chopstream");
 
-    function addChops(1000); // Load 1000 CHOPs initially {
+    function addChops(count) {
       for (let i = 0; i < count; i++) {
         const line = document.createElement("span");
         line.className = "chopline";
@@ -41,16 +36,13 @@
       }
     }
 
-    // Initial fill
-    addChops();
+    // Load enough to scroll immediately
+    addChops(2000);
 
     // Infinite scroll trigger
-window.addEventListener("scroll", () => {
-  if (window.scrollY + window.innerHeight >= document.body.scrollHeight - 10) {
-    addChops(500); // Add 500 more CHOPs each time
-  }
-}); {
-        addChops();
+    window.addEventListener("scroll", () => {
+      if (window.scrollY + window.innerHeight >= document.body.scrollHeight - 50) {
+        addChops(500);
       }
     });
   </script>
