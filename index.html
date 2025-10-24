@@ -26,16 +26,19 @@
 
 <script>
   const stream = document.getElementById("chopstream");
-
+line);
   function addChops(count) {
-    const fragment = document.createDocumentFragment();
-    for (let i = 0; i < count; i++) {
-      const line = document.createElement("span");
-      line.className = "chopline";
-      line.textContent = "CHOP";
-      fragment.appendChild(line);
-    }
-    stream.appendChild(fragment);
+  const fragment = document.createDocumentFragment();
+  for (let i = 0; i < count; i++) {
+    const line = document.createElement("span");
+    line.className = "chopline";
+    line.textContent = "CHOP";
+    line.style.animation = `flash ${0.5 + Math.random() * 2}s infinite`;
+    fragment.appendChild(line);
+  }
+  stream.appendChild(fragment);
+}
+
   }
 
 // Load CHOPs with a hidden message for Jordan
