@@ -3,22 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <title>endless.chop</title>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      background-color: #000;
-      color: #0f0;
-      font-family: monospace;
-      font-size: 20px;
-      overflow-x: hidden;
+<script>
+  const stream = document.getElementById("chopstream");
+
+  function addChops(count = 100) {
+    let lines = "";
+    for (let i = 0; i < count; i++) {
+      lines += "CHOP<br>";
     }
-    #chopstream {
-      padding: 20px;
-      white-space: pre-wrap;
-      word-break: break-word;
+    stream.innerHTML += lines;
+  }
+
+  // Initial fill
+  addChops();
+
+  // Infinite scroll trigger
+  window.addEventListener("scroll", () => {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+      addChops();
     }
-  </style>
+  });
+</script>
 </head>
 <body>
   <div id="chopstream">CHOP\n</div>
