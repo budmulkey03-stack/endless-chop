@@ -3,20 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <title>endless.chop</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #000;
-      color: #0f0;
-      font-family: monospace;
-      font-size: 20px;
-    }
-    #chopstream {
-      white-space: pre;
-      padding: 20px;
-    }
-  </style>
+ <style>
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: #000;
+    color: #0f0;
+    font-family: monospace;
+    font-size: 20px;
+    overflow-x: hidden; /* 🔒 Prevent horizontal scroll */
+  }
+  #chopstream {
+    white-space: pre; /* 🔁 Preserve line breaks */
+    padding: 20px;
+  }
+ </style>
 </head>
 <body>
   <div id="chopstream">CHOP\n</div>
