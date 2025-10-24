@@ -23,6 +23,20 @@
   margin-top: 20px;
   margin-bottom: 10px;
   animation: pulse 2s infinite;
+body {
+  margin: 0;
+  padding: 0;
+  font-family: monospace;
+  font-size: 20px;
+  overflow-x: hidden;
+  background: radial-gradient(circle at center, #001100 0%, #000000 80%);
+  animation: fogShift 20s infinite alternate;
+}
+
+@keyframes fogShift {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
 }
 
 @keyframes pulse {
