@@ -24,29 +24,29 @@
 <body>
   <div id="chopstream"></div>
 
-  <script>
-    const stream = document.getElementById("chopstream");
+<script>
+  const stream = document.getElementById("chopstream");
 
-    function addChops(count) {
-      const fragment = document.createDocumentFragment();
-      for (let i = 0; i < count; i++) {
-        const line = document.createElement("span");
-        line.className = "chopline";
-        line.textContent = "CHOP";
-        fragment.appendChild(line);
-      }
-      stream.appendChild(fragment);
+  function addChops(count) {
+    const fragment = document.createDocumentFragment();
+    for (let i = 0; i < count; i++) {
+      const line = document.createElement("span");
+      line.className = "chopline";
+      line.textContent = "CHOP";
+      fragment.appendChild(line);
     }
+    stream.appendChild(fragment);
+  }
 
-    // Load a massive batch up front
-    addChops(5000);
+  // Load a ton up front
+  addChops(3000);
 
-    // Infinite scroll trigger
-    window.addEventListener("scroll", () => {
-      if (window.scrollY + window.innerHeight >= document.body.scrollHeight - 200) {
-        addChops(1000);
-      }
-    });
-  </script>
+  // Start a loop that checks scroll position every 300ms
+  setInterval(() => {
+    if (window.scrollY + window.innerHeight >= document.body.scrollHeight - 200) {
+      addChops(1000);
+    }
+  }, 300);
+</script>
 </body>
 </html>
