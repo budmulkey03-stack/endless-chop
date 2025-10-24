@@ -8,6 +8,10 @@
   <title>endless.chop</title>
   <style>
     html, body {
+      <body>
+  <div id="bg"></div> <!-- NEW background layer -->
+  <div id="chopstream"></div>
+</body>
       margin: 0;
       padding: 0;
       background-color: #000;
@@ -29,8 +33,24 @@ body {
   font-family: monospace;
   font-size: 20px;
   overflow-x: hidden;
+  position: relative;
+}
+
+#bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
   background: radial-gradient(circle at center, #001100 0%, #000000 80%);
   animation: fogShift 20s infinite alternate;
+}
+
+@keyframes fogShift {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
 }
 
 @keyframes fogShift {
