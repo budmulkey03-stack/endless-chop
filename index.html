@@ -47,7 +47,7 @@
       margin: 0;
       animation: blink 0.8s steps(2, start) infinite;
     }
-
+ 
     @keyframes blink {
       to { visibility: hidden; }
     }
@@ -63,6 +63,22 @@
       object-fit: contain;
     }
 
+    #chopjordan {
+  max-width: 300px;
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 20px auto;
+  border: 2px solid #f00;
+  border-radius: 10px;
+  object-fit: contain;
+  animation: jordanPulse 2s infinite;
+}
+
+@keyframes jordanPulse {
+  0%, 100% { border-color: #f00; }
+  50% { border-color: #900; }
+}
     #chopstream {
       padding: 20px;
     }
@@ -88,7 +104,7 @@
   </div>
 
   <img src="Picsart_25-10-24_09-03-26-361.png" alt="Chop7 Character" id="chopimg">
-
+<img src="chopjordan.png" alt="Chop Jordan" id="chopjordan">
   <div id="chopstream"></div>
 
   <script>
