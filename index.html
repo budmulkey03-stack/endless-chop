@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>endless.chop</title>
  <style>
-  body {
+  html, body {
     margin: 0;
     padding: 0;
     background-color: #000;
@@ -14,10 +14,11 @@
     overflow-x: hidden; /* 🔒 Prevent horizontal scroll */
   }
   #chopstream {
-    white-space: pre; /* 🔁 Preserve line breaks */
+    white-space: pre-wrap; /* ✅ Wrap long lines */
+    word-break: break-word; /* ✅ Break long words */
     padding: 20px;
   }
- </style>
+</style>
 </head>
 <body>
   <div id="chopstream">CHOP\n</div>
