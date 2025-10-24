@@ -3,40 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <title>endless.chop</title>
-<script>
-  const stream = document.getElementById("chopstream");
-
-  function addChops(count = 100) {
-    let lines = "";
-    for (let i = 0; i < count; i++) {
-      lines += "CHOP<br>";
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: #000;
+      color: #0f0;
+      font-family: monospace;
+      font-size: 20px;
+      overflow-x: hidden;
     }
-    stream.innerHTML += lines;
-  }
-
-  // Initial fill
-  addChops();
-
-  // Infinite scroll trigger
-  window.addEventListener("scroll", () => {
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
-      addChops();
+    #chopstream {
+      padding: 20px;
     }
-  });
-</script>
+    .chopline {
+      display: block;
+    }
+  </style>
 </head>
 <body>
-  <div id="chopstream">CHOP\n</div>
+  <div id="chopstream"></div>
 
   <script>
     const stream = document.getElementById("chopstream");
 
     function addChops(count = 100) {
-      let lines = "";
       for (let i = 0; i < count; i++) {
-        lines += "CHOP\\n";
+        const line = document.createElement("span");
+        line.className = "chopline";
+        line.textContent = "CHOP";
+        stream.appendChild(line);
       }
-      stream.textContent += lines;
     }
 
     // Initial fill
