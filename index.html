@@ -28,21 +28,23 @@
     const stream = document.getElementById("chopstream");
 
     function addChops(count) {
+      const fragment = document.createDocumentFragment();
       for (let i = 0; i < count; i++) {
         const line = document.createElement("span");
         line.className = "chopline";
         line.textContent = "CHOP";
-        stream.appendChild(line);
+        fragment.appendChild(line);
       }
+      stream.appendChild(fragment);
     }
 
-    // Load enough to scroll immediately
-    addChops(2000);
+    // Load a massive batch up front
+    addChops(5000);
 
     // Infinite scroll trigger
     window.addEventListener("scroll", () => {
-      if (window.scrollY + window.innerHeight >= document.body.scrollHeight - 50) {
-        addChops(500);
+      if (window.scrollY + window.innerHeight >= document.body.scrollHeight - 200) {
+        addChops(1000);
       }
     });
   </script>
