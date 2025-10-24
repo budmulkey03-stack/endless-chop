@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>endless.chop</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #000;
+      color: #0f0;
+      font-family: monospace;
+      font-size: 20px;
+    }
+    #chopstream {
+      white-space: pre;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="chopstream">CHOP\n</div>
+
+  <script>
+    const stream = document.getElementById("chopstream");
+
+    function addChops(count = 100) {
+      let lines = "";
+      for (let i = 0; i < count; i++) {
+        lines += "CHOP\\n";
+      }
+      stream.textContent += lines;
+    }
+
+    // Initial fill
+    addChops();
+
+    // Add more lines as user scrolls near bottom
+    window.addEventListener("scroll", () => {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+        addChops();
+      }
+    });
+  </script>
+</body>
+</html>
