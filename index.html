@@ -13,7 +13,11 @@
       font-size: 20px;
       overflow-x: hidden;
     }
-
+    <div class="chopvideo">
+  <iframe 
+    src="https://www.youtube.com/embed/wTUTMB1w-hE" 
+    frameborder="0" allowfullscreen></iframe>
+</div>
     #bg {
       position: fixed;
       top: 0;
@@ -81,15 +85,21 @@
       animation: flash 1s infinite;
     }
     .chopvideo {
-  display: flex;
-  justify-content: center;
-  margin: 20px auto;
-}
-
-.chopvideo iframe {
+  width: 320px;
+  margin: 30px auto;
+  padding: 10px;
   border: 4px solid magenta;
   border-radius: 12px;
-  box-shadow: 0 0 20px magenta;
+  box-shadow: 0 0 25px magenta;
+  background-color: #000;
+}
+.chopvideo iframe {
+  width: 100%;
+  height: 180px;
+  display: block;
+  border: none;
+}
+
 }
     @keyframes flash {
       0%, 100% { opacity: 1; }
