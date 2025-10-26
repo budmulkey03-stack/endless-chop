@@ -13,11 +13,7 @@
       font-size: 20px;
       overflow-x: hidden;
     }
-    <div class="chopvideo">
-  <iframe 
-    src="https://www.youtube.com/embed/wTUTMB1w-hE" 
-    frameborder="0" allowfullscreen></iframe>
-</div>
+
     #bg {
       position: fixed;
       top: 0;
@@ -70,6 +66,23 @@
       object-fit: contain;
     }
 
+    .chopvideo {
+      width: 320px;
+      margin: 30px auto;
+      padding: 10px;
+      border: 4px solid magenta;
+      border-radius: 12px;
+      box-shadow: 0 0 25px magenta;
+      background-color: #000;
+    }
+
+    .chopvideo iframe {
+      width: 100%;
+      height: 180px;
+      display: block;
+      border: none;
+    }
+
     #chopstream {
       text-align: center;
       padding: 0;
@@ -84,23 +97,7 @@
       line-height: 1.2;
       animation: flash 1s infinite;
     }
-    .chopvideo {
-  width: 320px;
-  margin: 30px auto;
-  padding: 10px;
-  border: 4px solid magenta;
-  border-radius: 12px;
-  box-shadow: 0 0 25px magenta;
-  background-color: #000;
-}
-.chopvideo iframe {
-  width: 100%;
-  height: 180px;
-  display: block;
-  border: none;
-}
 
-}
     @keyframes flash {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.1; }
@@ -115,14 +112,16 @@
     <h2>ENDLESS JORDAN</h2>
   </header>
 
-  <img src="chopjordan.png" alt="Chop Jordan" id="chopjordan">
+  <img src="jordandog.png" alt="Jordan Tribute" id="chopjordan">
+
+  <div class="chopvideo">
+    <iframe 
+      src="https://www.youtube.com/embed/wTUTMB1w-hE" 
+      frameborder="0" allowfullscreen></iframe>
+  </div>
 
   <div id="chopstream"></div>
-<div class="chopvideo">
-  <iframe width="300" height="170" 
-    src="https://www.youtube.com/embed/wTUTMB1w-hE" 
-    frameborder="0" allowfullscreen></iframe>
-</div>
+
   <script>
     const stream = document.getElementById("chopstream");
 
