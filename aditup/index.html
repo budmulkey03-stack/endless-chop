@@ -1,1 +1,35 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chop7 Ad It Up Optimizer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Chop7 Ad It Up Optimizer</h1>
+  <p>Estimate your Ad It Up level from Treehouse Fishing stats</p>
+
+  <label>🎒 Backpack Level: <input type="number" id="backpack" value="20" /></label><br />
+  <label>🧵 Rope Length: <input type="number" id="rope" value="210" /></label><br />
+  <label>🎁 Ads Watched: <input type="number" id="ads" value="3" /></label><br />
+  <label>⏱️ Minutes Played: <input type="number" id="minutes" value="30" /></label><br />
+
+  <button onclick="calculate()">Optimize</button>
+
+  <div class="result" id="output"></div>
+
+  <script>
+    function calculate() {
+      const backpack = parseInt(document.getElementById('backpack').value);
+      const rope = parseInt(document.getElementById('rope').value);
+      const ads = parseInt(document.getElementById('ads').value);
+      const minutes = parseInt(document.getElementById('minutes').value);
+
+      const level = backpack * 2 + rope + ads * 5 + Math.floor(minutes / 5) * 10;
+      document.getElementById('output').innerText = `🔥 Estimated Ad It Up Level: ${level}`;
+    }
+  </script>
+</body>
+</html>
