@@ -18,7 +18,25 @@
   <label>⏱️ Minutes Played: <input type="number" id="minutes" value="30" /></label><br />
 
   <button onclick="calculate()">Optimize</button>
+   {
+      margin: 0;
+      padding: 0;
+      background-color: #000;
+      color: #0f0;
+      font-family: monospace;
+      font-size: 20px;
+      overflow-x: hidden;
+    }
 
+    #bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background: radial-gradient(circle at center, #001100 0%, #000000 80%);
+    }
   <div class="result" id="output"></div>
 
   <script>
