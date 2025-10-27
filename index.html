@@ -13,7 +13,9 @@
       font-size: 20px;
       overflow-x: hidden;
     }
-
+     <div class="jordan-banner">
+  <span class="jordan-text">Jordandog Eternal 🐾</span>
+</div>
     #bg {
       position: fixed;
       top: 0;
@@ -97,7 +99,31 @@
       line-height: 1.2;
       animation: flash 1s infinite;
     }
+    .jordan-banner {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 12px 24px;
+  border-radius: 8px;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+  animation: shimmer 3s infinite;
+}
 
+.jordan-text {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.2rem;
+  color: #f0f0f0;
+  letter-spacing: 1px;
+}
+
+@keyframes shimmer {
+  0% { box-shadow: 0 0 12px rgba(255, 255, 255, 0.3); }
+  50% { box-shadow: 0 0 24px rgba(255, 255, 255, 0.6); }
+  100% { box-shadow: 0 0 12px rgba(255, 255, 255, 0.3); }
+}
     @keyframes flash {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.1; }
@@ -105,6 +131,7 @@
   </style>
 </head>
 <body>
+  <div class="fog-layer"></div>
   <div id="bg"></div>
 
   <header>
