@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Fireworks Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles for the simulation and ensuring full screen responsiveness */
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: #0d0d1a; /* Very dark purple/blue background */
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+        #controls {
+            position: absolute;
+            top: 0.75rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            background-color: rgba(0, 0, 0, 0.4);
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .llm-button {
+            padding: 0.5rem 1rem;
+            background-color: #ff5722; /* Vibrant orange */
+            color: white;
+            font-weight: bold;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s, transform 0.1s;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+        .llm-button:hover {
+            background-color: #ff7043;
+            transform: translateY(-1px);
+        }
+        .llm-button:disabled {
+            background-color: #a0a0a0;
+            cursor: not-allowed;
+        }
+        #messageOverlay {
+            position: absolute;
+            top: 25%; /* High up where fireworks explode */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            opacity: 0;
+            transition: opacity 0.5s, transform 0.5s;
+            max-width: 90%;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            pointer-events: none; /* Allows clicks to pass through */
+        }
+        #messageOverlay.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #fff;
+            width: 1rem;
+            height: 1rem;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="controls" class="text-sm sm:text-base">
+        <span>Click anywhere to launch a rocket!</span>
+        <button id="geminiButton" class="llm-button" onclick="generateCelebrationMessage(this)">
+            ✨ Generate Celebration Message
+        </button>
+    </div>
+    
+    <div id="messageOverlay"></div>
+    <canvas id="fireworksCanvas"></canvas>
+
+    <script>
+        // --- Gemini API Configuration ---
+        const GEMINI_MODEL = "gemini-2.5-flash-preview-09-2025";
+        const GEMINI_API_KEY = ""; // Canvas environment provides this
+        const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+        
+        // --- Utility Functions for Gemini API ---
+
+        /**
+         * Fetches a response from the Gemini API with exponential backoff for retries.
+         * @param {object} payload - The API payload containing contents and systemInstruction.
+         * @returns {Promise<string|null>} The generated text or null if failed.
+         */
+        async function fetchGeminiResponse(payload) {
+            const MAX_RETRIES = 5;
+            for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+                try {
+                    const response = await fetch(GEMINI_API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.status === 429 && attempt < MAX_RETRIES - 1) {
+                        // Rate limit error: Wait and retry with exponential backoff
+                        const delay = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        continue;
+                    }
+
+                    if (!response.ok) {
+                        throw new Error(`API call failed with status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    return result.candidates?.[0]?.content?.parts?.[0]?.text || "Failed to generate message.";
+
+                } catch (error) {
+                    console.error("Gemini API Error:", error);
+                    if (attempt === MAX_RETRIES - 1) {
+                        return "Error: Could not connect to the celebration server.";
+                    }
+                }
+            }
+            return null; // Should not be reached, but for safety
+        }
+
+        /**
+         * Handles the button click, calls the Gemini API, and displays the message.
+         * @param {HTMLButtonElement} button - The button element.
+         */
+        async function generateCelebrationMessage(button) {
+            const originalText = button.innerHTML;
+            const messageOverlay = document.getElementById('messageOverlay');
+            
+            // 1. Set Loading State
+            button.disabled = true;
+            button.innerHTML = '<div class="spinner"></div> Generating...';
+            
+            // 2. Define API Payload
+            const systemPrompt = "You are an inspiring celebratory toast generator. Write a short, single-sentence quote or toast suitable for a grand celebration or moment of awe. The message should be highly positive and evocative.";
+            const userQuery = "Generate a celebratory message for a spectacular moment.";
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            // 3. Fetch Response
+            const message = await fetchGeminiResponse(payload);
+            
+            // 4. Display Message and Reset Button
+            if (message) {
+                showMessageOverlay(message, 5000); // Show for 5 seconds
+            }
+
+            button.innerHTML = originalText;
+            button.disabled = false;
+        }
+
+        /**
+         * Displays a message overlay on the screen for a given duration.
+         * @param {string} text - The text to display.
+         * @param {number} duration - Duration in milliseconds to show the message.
+         */
+        function showMessageOverlay(text, duration) {
+            const overlay = document.getElementById('messageOverlay');
+            overlay.textContent = text;
+            overlay.classList.add('show');
+            
+            // Remove the 'show' class after the duration to fade it out
+            setTimeout(() => {
+                overlay.classList.remove('show');
+            }, duration);
+        }
+
+        // --- Canvas Setup and Global Variables (Existing Logic) ---
+        const canvas = document.getElementById('fireworksCanvas');
+        const ctx = canvas.getContext('2d');
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+
+        const fireworks = [];
+        const particles = [];
+        const gravity = 0.08;
+
+        // Utility to get a random number within a range
+        const random = (min, max) => Math.random() * (max - min) + min;
+
+        // Handle resizing the canvas to maintain responsiveness
+        window.addEventListener('resize', () => {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        });
+
+        // --- Particle Class (Explosion Sparks) ---
+        class Particle {
+            constructor(x, y, hue) {
+                this.x = x;
+                this.y = y;
+                // Generate a random velocity for explosion effect
+                this.angle = random(0, Math.PI * 2);
+                this.speed = random(1, 10);
+                this.vx = Math.cos(this.angle) * this.speed;
+                this.vy = Math.sin(this.angle) * this.speed;
+
+                this.hue = hue;
+                this.lightness = random(50, 80);
+                this.alpha = 1;
+                this.decay = random(0.015, 0.03);
+            }
+
+            update() {
+                // Apply gravity
+                this.vy += gravity;
+                // Update position
+                this.x += this.vx;
+                this.y += this.vy;
+                // Fade out
+                this.alpha -= this.decay;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, random(1, 2), 0, Math.PI * 2, false);
+                // Draw color using HSL (Hue, Saturation, Lightness)
+                ctx.fillStyle = `hsla(${this.hue}, 100%, ${this.lightness}%, ${this.alpha})`;
+                ctx.fill();
+            }
+        }
+
+        // --- Firework Class (The Rocket) ---
+        class Firework {
+            constructor(targetX, targetY) {
+                // Start position at the bottom center of the screen
+                this.x = width / 2;
+                this.y = height;
+                this.targetX = targetX;
+                this.targetY = targetY;
+
+                // Calculate velocity to reach the target smoothly
+                const distance = Math.sqrt(Math.pow(targetX - this.x, 2) + Math.pow(targetY - this.y, 2));
+                const speed = 6; // Fixed launch speed
+                this.vx = ((targetX - this.x) / distance) * speed;
+                this.vy = ((targetY - this.y) / distance) * speed;
+
+                this.exploded = false;
+                this.hue = random(0, 360); // Random base color for the firework
+            }
+
+            update() {
+                if (this.exploded) return;
+
+                // Check if the firework has passed its target (time to explode)
+                if (this.y < this.targetY || (this.y < height / 4 && this.vy < 0)) {
+                    this.explode();
+                    this.exploded = true;
+                    return;
+                }
+
+                // Move the rocket
+                this.x += this.vx;
+                this.y += this.vy;
+                // Slight reduction in vertical velocity to simulate air resistance on ascent
+                this.vy += gravity * 0.5;
+            }
+
+            draw() {
+                if (this.exploded) return;
+
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 2, 0, Math.PI * 2, false);
+                // Rocket color: bright and noticeable
+                ctx.fillStyle = `hsl(${this.hue}, 100%, 70%)`;
+                ctx.fill();
+            }
+
+            explode() {
+                const count = 75 + Math.floor(random(0, 50)); // Number of sparks
+                for (let i = 0; i < count; i++) {
+                    particles.push(new Particle(this.x, this.y, this.hue));
+                }
+            }
+        }
+
+        // --- Animation Loop ---
+
+        function update() {
+            // Update fireworks
+            for (let i = fireworks.length - 1; i >= 0; i--) {
+                fireworks[i].update();
+                // Remove exploded fireworks
+                if (fireworks[i].exploded) {
+                    fireworks.splice(i, 1);
+                }
+            }
+
+            // Update particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                // Remove faded particles
+                if (particles[i].alpha <= particles[i].decay) {
+                    particles.splice(i, 1);
+                }
+            }
+        }
+
+        function draw() {
+            // Draw a transparent overlay rectangle to create trails (persistence of vision effect)
+            ctx.fillStyle = 'rgba(13, 13, 26, 0.05)';
+            ctx.fillRect(0, 0, width, height);
+
+            // Draw fireworks
+            fireworks.forEach(f => f.draw());
+
+            // Draw particles
+            particles.forEach(p => p.draw());
+        }
+
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        // --- Interaction and Spawning ---
+
+        // Launch a firework at the clicked location
+        canvas.addEventListener('click', (e) => {
+            const targetX = e.clientX;
+            const targetY = e.clientY;
+            // Prevent launching below the bottom quarter of the screen
+            if (targetY < height * 0.9) {
+                fireworks.push(new Firework(targetX, targetY));
+            }
+        });
+
+        // Automatic firework launcher
+        let autoLaunchInterval;
+        function startAutoLaunch() {
+            if (autoLaunchInterval) clearInterval(autoLaunchInterval);
+            autoLaunchInterval = setInterval(() => {
+                const targetX = random(width * 0.1, width * 0.9);
+                const targetY = random(height * 0.1, height * 0.6); // Target upper part of the screen
+                fireworks.push(new Firework(targetX, targetY));
+            }, 1000); // Launches one firework every 1 second
+        }
+
+        // Start the simulation
+        window.onload = function() {
+            startAutoLaunch();
+            loop();
+        }
+
+    </script>
+</body>
+</html>
