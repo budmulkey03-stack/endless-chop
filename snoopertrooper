@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Event Snooper</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom scrollbar for the log area */
+        .log-area::-webkit-scrollbar {
+            width: 8px;
+        }
+        .log-area::-webkit-scrollbar-thumb {
+            background-color: #4b5563;
+            border-radius: 4px;
+        }
+        .log-area::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#2563eb',
+                        'secondary': '#1f2937',
+                        'tertiary': '#374151',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex items-center justify-center p-4 font-sans">
+
+    <div class="w-full max-w-4xl bg-secondary rounded-xl shadow-2xl p-6 md:p-8">
+        <h1 class="text-3xl font-extrabold text-primary mb-2 text-center">
+            Phone Snooper "Snooper Trooper"
+        </h1>
+        <p class="text-sm text-gray-400 mb-6 text-center">
+            Watch for *Nearby Phone Connectivity* and **Spyware tools trying to access MotoG G5 2024** and report logs instantly to budmulkey03@gmail.com also send SMS 470-216-7615
+        </p>
+
+        <div class="flex flex-col md:flex-row gap-6">
+
+            <!-- Log Display Area -->
+            <div class="flex-grow">
+                <h2 class="text-xl font-semibold mb-3 text-gray-200">
+                    Snooping Log
+                </h2>
+                <div id="log" class="log-area h-96 bg-gray-800 p-4 rounded-lg overflow-y-auto border border-tertiary text-sm space-y-1">
+                    <p class="text-gray-500 italic">Logs will appear here in real-time...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="mt-6 flex justify-center space-x-4">
+            <button id="clearLogBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 shadow-lg active:shadow-md">
+                Clear Log
+            </button>
+            <span id="eventCounter" class="bg-tertiary text-primary font-bold py-2 px-4 rounded-lg flex items-center">
+                Events: 0
+            </span>
+        </div>
+    </div>
+
+    <script>
+        // --- Firebase Setup (Required Global Variables) ---
+        // Although not strictly needed for a local event logger, this structure is mandatory for Canvas apps.
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // The logger operates independently of Firebase, but we include the variables for context.
+        // --- End Firebase Setup ---
+
+        const logElement = document.getElementById('log');
+        const clearLogBtn = document.getElementById('clearLogBtn');
+        const eventCounterElement = document.getElementById('eventCounter');
+        let eventCount = 0;
+
+        // Utility function to format the log entry
+        function logEvent(type, details) {
+            eventCount++;
+            eventCounterElement.textContent = `Events: ${eventCount}`;
+
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit', fractionalSecondDigits: 3 });
+
+            // Create the log entry element
+            const logEntry = document.createElement('div');
+            logEntry.className = 'py-1 border-b border-gray-700 last:border-b-0';
+
+            let typeClass = 'text-yellow-400';
+            let detailString = '';
+
+            if (type === 'KEY') {
+                typeClass = 'text-green-400';
+                detailString = `Key: <span class="font-mono text-gray-300">${details.key}</span>, Code: <span class="font-mono text-gray-300">${details.code}</span>`;
+            } else if (type === 'CLICK') {
+                typeClass = 'text-blue-400';
+                detailString = `Button: <span class="text-gray-300">${details.button}</span>, Coords: <span class="font-mono text-gray-300">(${details.x}, ${details.y})</span>`;
+            }
+
+            logEntry.innerHTML = `
+                <span class="text-gray-500">${timeString}</span>
+                <span class="${typeClass} font-semibold ml-2">(${type})</span>
+                <span class="ml-3">${detailString}</span>
+            `;
+
+            // FIX: Ensure firstChild exists before accessing its properties.
+            // This prevents the "Cannot read properties of undefined (reading 'contains')" error.
+            if (logElement.firstChild && logElement.firstChild.classList.contains('italic')) {
+                logElement.innerHTML = ''; // Clear the initial placeholder
+            }
+
+            logElement.prepend(logEntry);
+
+            // Keep only the last 50 entries
+            while (logElement.children.length > 50) {
+                logElement.removeChild(logElement.lastChild);
+            }
+        }
+
+        // --- Event Listeners ---
+
+        // 1. Key Press Listener (keydown)
+        document.addEventListener('keydown', (event) => {
+            // Filter out common modifier keys that might spam the log
+            if (event.key === 'Shift' || event.key === 'Control' || event.key === 'Alt' || event.key === 'Meta') {
+                return;
+            }
+            logEvent('KEY', {
+                key: event.key === ' ' ? '[Space]' : event.key, // Display space clearly
+                code: event.code,
+            });
+        });
+
+        // 2. Mouse Click Listener (click)
+        document.addEventListener('click', (event) => {
+            // Map event.button to descriptive names
+            let buttonName;
+            switch (event.button) {
+                case 0: buttonName = 'Left'; break;
+                case 1: buttonName = 'Middle (Scroll Wheel)'; break;
+                case 2: buttonName = 'Right'; break;
+                default: buttonName = 'Other';
+            }
+
+            logEvent('CLICK', {
+                button: buttonName,
+                x: event.clientX,
+                y: event.clientY,
+            });
+        });
+
+        // 3. Clear Log Button Handler
+        clearLogBtn.addEventListener('click', () => {
+            logElement.innerHTML = '<p class="text-gray-500 italic">Log cleared. Ready for new events...</p>';
+            eventCount = 0;
+            eventCounterElement.textContent = `Events: 0`;
+        });
+
+        // Initial welcome message
+        window.onload = () => {
+             logEvent('SYSTEM', { key: 'Initialized', code: '' });
+             logElement.children[0].innerHTML = '<span class="text-gray-500">...</span> <span class="text-red-500 font-semibold ml-2">(SYSTEM)</span> <span class="ml-3">Event Snooper Active. Try clicking and typing!</span>';
+        };
+
+    </script>
+</body>
+</html>
